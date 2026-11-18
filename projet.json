@@ -1,9 +1,9 @@
 {
   "nom": "Nom du projet",
-  "pitch": "Une phrase qui dit ce que fait le projet.",
+  "pitch": "L'objectif est de transformer un rapport d'orientation, parfois difficile à interpréter, en une expérience interactive et personnalisée.",
   "description": "Premier paragraphe : le problème que vous résolvez.\n\nDeuxième paragraphe : comment ça marche, et ce que vous avez construit en trois jours.",
-  "ecoles": ["École 1", "École 2"],
-  "stack": ["HTML", "JavaScript"],
+  "ecoles": ["Aivancity", "Centrale Méditerranée"],
+  "stack": ["HTML", "JavaScript", "React", "TypeScript", "Vite", "Python", "FastAPI"],
   "demo": "",
   "video": "",
   "captures": []
