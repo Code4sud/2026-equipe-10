@@ -1,0 +1,10 @@
+#!/bin/sh
+# Bloque tout commit contenant un PDF, un Excel ou un fichier du dossier private/ (règle 3 du hackathon).
+bad=$(git diff --cached --name-only --diff-filter=ACM | grep -Ei '(^private/|^data/raw/|\.pdf$|\.xlsx?$)')
+if [ -n "$bad" ]; then
+  echo "Commit refusé : ces fichiers ne doivent pas aller dans le dépôt public :"
+  echo "$bad"
+  echo "Retire-les avec : git restore --staged <fichier>"
+  exit 1
+fi
+exit 0

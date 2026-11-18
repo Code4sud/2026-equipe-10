@@ -1,10 +1,21 @@
 {
-  "nom": "Nom du projet",
-  "pitch": "L'objectif est de transformer un rapport d'orientation, parfois difficile à interpréter, en une expérience interactive et personnalisée.",
-  "description": "Premier paragraphe : le problème que vous résolvez.\n\nDeuxième paragraphe : comment ça marche, et ce que vous avez construit en trois jours.",
-  "ecoles": ["Aivancity", "Centrale Méditerranée"],
-  "stack": ["HTML", "JavaScript", "React", "TypeScript", "Vite", "Python", "FastAPI"],
-  "demo": "",
+  "nom": "Explore tes possibles",
+  "pitch": "Un assistant qui explique, avec ses sources, les métiers du Rapport des Possibles et donne envie de pousser la porte du Centre.",
+  "description": "Après le Centre des Possibles, un jeune repart avec une liste de métiers parfois inconnus. Le soir, seul, il se demande : c'est quoi concrètement, quel diplôme, est-ce possible sans le bac ? Personne n'est là pour répondre.\n\nExplore tes possibles lit le rapport directement sur le téléphone (rien n'est envoyé), relie chaque métier aux référentiels publics (ROME, ONISEP, Carif-Oref), montre tous les chemins pour y arriver près de Nice et répond aux questions en citant ses sources. Il dit « je ne sais pas » plutôt que d'inventer, ne donne jamais de note ni de classement, et prépare le rendez-vous avec le psychologue du Centre.",
+  "ecoles": [
+    "Aivancity",
+    "Centrale Méditerranée"
+  ],
+  "stack": [
+    "React",
+    "TypeScript",
+    "Vite",
+    "pdf.js",
+    "Python",
+    "FastAPI",
+    "OVHcloud AI Endpoints (modèles open weight)"
+  ],
+  "demo": "https://code4sud.github.io/2026-equipe-10/",
   "video": "",
   "captures": []
 }

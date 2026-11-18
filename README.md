@@ -4,12 +4,16 @@ Projet réalisé à Nice les 18, 19 et 20 novembre 2026, sur le thème **« L'or
 
 ## Le projet
 
-_Deux ou trois phrases : le problème, la solution, pour qui._
+Après le Centre des Possibles, un jeune repart avec une liste de métiers dont il ne sait souvent rien. **Explore tes possibles** lit son rapport sur son téléphone (rien n'est envoyé), explique chaque métier avec des sources publiques (ROME, ONISEP, Carif-Oref), montre tous les chemins pour y arriver près de Nice et prépare son rendez-vous avec le psychologue. Pas de note, pas de classement, et « je ne sais pas » plutôt qu'une réponse inventée.
+
+**Changer le nom ou les couleurs :** tout est dans `src/theme.ts`.
 
 ## Lancer le projet
 
 ```bash
-# Comment installer et démarrer, en 5 lignes maximum
+npm install          # installe aussi le hook qui bloque PDF, Excel et private/
+cp .env.example .env # VITE_API_URL vide = mode démo, sans backend
+npm run dev          # http://localhost:5173/2026-equipe-10/
 ```
 
 ## Publier sur le site du hackathon
