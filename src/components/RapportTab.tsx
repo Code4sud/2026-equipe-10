@@ -128,6 +128,11 @@ export function RapportTab({ count, onImport, onReset, sourceLabel, goMetiers, g
             <div className="row"><Star size={18} /><strong className="title-sm">Bon à savoir</strong></div>
             <p className="body">Les zones de ton rapport donnent un temps de préparation indicatif. En France, certains métiers sont plus accessibles : on te le signale, d'après les fiches de l'ONISEP.</p>
           </Card>
+          <Card>
+            <div className="row"><Star size={18} /><strong className="title-sm">Complète ton rapport avec tes mots</strong></div>
+            <p className="body">En 5 minutes, dis ce qui compte pour toi et ce que tu as déjà vécu. On te montre ce qui rejoint les métiers de ton rapport, et tu repars avec un PDF pour ton rendez-vous.</p>
+            <button type="button" className="btn" onClick={goDecouvrir}>Me découvrir · 5 minutes</button>
+          </Card>
         </div>
       )}
     </section>

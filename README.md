@@ -4,7 +4,7 @@ Projet réalisé à Nice les 18, 19 et 20 novembre 2026, sur le thème **« L'or
 
 ## Le projet
 
-Après le Centre des Possibles, un jeune repart avec une liste de métiers dont il ne sait souvent rien. **Trait d'union** lit son rapport sur son téléphone (rien n'est envoyé), explique chaque métier avec des sources publiques (ROME, ONISEP, Carif-Oref), montre tous les chemins pour y arriver près de Nice et prépare son rendez-vous avec le psychologue. Pas de note, pas de classement, et « je ne sais pas » plutôt qu'une réponse inventée.
+Après le Centre des Possibles, un jeune repart avec une liste de métiers dont il ne sait souvent rien. **Trait d'union** lit son rapport sur son téléphone (rien n'est envoyé), explique chaque métier avec des sources publiques (1 138 fiches ONISEP), montre les chemins pour y arriver et prépare son rendez-vous avec le psychologue. Sans rapport, le parcours **Me découvrir** (5 minutes) l'aide à dire avec ses mots ce qui compte pour lui, propose des pistes qui disent toujours *pourquoi* elles sont là, et lui laisse un PDF pour le rendez-vous. L'assistant IA (Mistral Small 3.2, open weight, hébergé en UE chez OVHcloud) cite ses sources. Pas de note, pas de classement, et « je ne sais pas » plutôt qu'une réponse inventée.
 
 **Changer le nom ou les couleurs :** tout est dans `src/theme.ts`.
 

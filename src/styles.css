@@ -98,7 +98,7 @@ button, input, select { font: inherit; }
 .badge-ok { width: 36px; height: 36px; border-radius: 18px; background: var(--c-success); color: #0B1F3A; display: inline-flex; align-items: center; justify-content: center; }
 .checklist { display: flex; flex-direction: column; gap: 4px; }
 .check-item { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; cursor: pointer; }
-.check-item input { width: 20px; height: 20px; accent-color: var(--c-accent); }
+.check-item input { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--c-accent); }
 
 /* ---------- Métiers ---------- */
 .metiers-layout { display: grid; grid-template-columns: 1fr; gap: 28px; align-items: start; }
