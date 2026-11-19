@@ -99,12 +99,17 @@ def answer(question: str, metier: dict, zone: int | None = None) -> dict:
             return {"text": SAFE_FALLBACK, "sources": [], "known": False, "suggest_save": True}
 
     # Garde-fou 2 : une réponse « connue » doit citer au moins un fait qui existe vraiment.
-    cited = [by_id[i] for i in out.get("source_ids", []) if i in by_id]
-    known = bool(out.get("known")) and bool(cited)
+    # Les modèles écrivent les numéros de faits de plusieurs façons (["F2"], "F2, F3", ["[F2]"], [2]…) : on les lit tous.
+    ids = re.findall(r"F?\s*(\d+)", json.dumps(out.get("source_ids", []), ensure_ascii=False))
+    cited = [by_id[k] for k in dict.fromkeys(f"F{n}" for n in ids) if k in by_id]
+    claimed = str(out.get("known", "")).strip().lower() in ("true", "1", "oui", "yes")
+    known = claimed and bool(cited)
     text = str(out.get("answer", "")).strip()
     # Certains modèles recopient des champs techniques dans le texte (« known=false. ») : on les retire.
     text = re.sub(r"\b(known|source_ids|suggest_save)\s*[=:]\s*\S+[.,;]?\s*", "", text, flags=re.I).strip()
-    if not known and out.get("known"):
+    if config.DEBUG:  # journal de mise au point, désactivé par défaut (aucune question n'est conservée)
+        print("LLM:", json.dumps(out, ensure_ascii=False)[:600], "| cités:", [f.id for f in cited])
+    if not known and claimed:
         text = ("Je n'ai pas d'information vérifiée pour répondre à ça, et je préfère ne pas inventer. "
                 "Tu peux garder cette question pour ton rendez-vous au Centre.")
 

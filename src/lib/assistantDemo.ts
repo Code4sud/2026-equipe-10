@@ -16,7 +16,7 @@ const INTENTS: [Intent, RegExp][] = [
   ['hesite', /(hesit|choisir|lequel|laquelle|le mieux|la mieux|departager|entre les deux)/],
   ['cout', /(cout|prix|cher|gratuit|payer la formation|frais)/],
   ['pres', /(pres de|nice|ou se former|ou etudier|loin|distance|ville|ecole|lycee|cfa)/],
-  ['bac', /(bac|diplome|etudes|niveau requis|sans le|quelle formation)/],
+  ['bac', /(bac|diplome|etudes|niveau requis|sans le|formation|ecole a faire|apprendre|cursus)/],
   ['quoi', /(c.?est quoi|concretement|fait quoi|journee|quotidien|en quoi consiste)/],
 ];
 

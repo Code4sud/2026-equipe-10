@@ -72,3 +72,10 @@ def test_salutation_sans_ia(monkeypatch):
     monkeypatch.setattr(assistant, "_call_llm", lambda *a, **k: (_ for _ in ()).throw(AssertionError("ne doit pas appeler l'IA")))
     r = client.post("/api/chat", json={"question": "Salut !", "metier_id": "MET.448"}).json()
     assert r["known"] and r["text"].startswith("Salut")
+
+
+def test_numeros_de_faits_mal_formates(monkeypatch):
+    for ids in (["F2"], "F2, F3", ["[F2]"], [2], "F1 et F3"):
+        monkeypatch.setattr(assistant, "_call_llm", fake_llm([{"answer": "Le CAP après la 3e.", "source_ids": ids, "known": "true"}]))
+        r = client.post("/api/chat", json={"question": "quelle formation ?", "metier_id": "MET.448"}).json()
+        assert r["known"] and r["text"].startswith("Le CAP"), ids
