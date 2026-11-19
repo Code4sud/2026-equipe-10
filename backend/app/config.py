@@ -18,8 +18,8 @@ except FileNotFoundError:
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1")
 HAS_KEY = bool(os.getenv("LLM_API_KEY", "").strip())
 LLM_API_KEY = os.getenv("LLM_API_KEY", "").strip() or "sans-cle"
-LLM_MODEL = os.getenv("LLM_MODEL", "Meta-Llama-3_3-70B-Instruct")
-LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "30"))
+LLM_MODEL = os.getenv("LLM_MODEL", "Mistral-Small-3.2-24B-Instruct-2506")
+LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "60"))
 
 # Origines autorisées à appeler l'API (le front local et GitHub Pages).
 CORS_ORIGINS = [o.strip() for o in os.getenv(

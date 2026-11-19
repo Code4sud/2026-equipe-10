@@ -14,7 +14,7 @@ services:
       - key: LLM_BASE_URL
         value: https://oai.endpoints.kepler.ai.cloud.ovh.net/v1
       - key: LLM_MODEL
-        value: Meta-Llama-3_3-70B-Instruct
+        value: Mistral-Small-3.2-24B-Instruct-2506
       - key: LLM_API_KEY
         sync: false
       - key: CORS_ORIGINS

@@ -22,7 +22,7 @@ client = OpenAI(
     http_client=None if config.HAS_KEY else httpx.Client(event_hooks={"request": [_sans_cle]}),
 )
 
-SYSTEM = """Tu es l'assistant d'orientation « Explore tes possibles » pour des jeunes de 16 à 25 ans à Nice.
+SYSTEM = """Tu es l'assistant d'orientation «  Trait d'union  » pour des jeunes de 16 à 25 ans à Nice.
 Tu réponds en français, en tutoyant, avec des phrases courtes et simples (3 à 5 phrases maximum).
 
 RÈGLES ABSOLUES :
@@ -95,6 +95,8 @@ def answer(question: str, metier: dict) -> dict:
     cited = [by_id[i] for i in out.get("source_ids", []) if i in by_id]
     known = bool(out.get("known")) and bool(cited)
     text = str(out.get("answer", "")).strip()
+        # Certains modèles recopient des champs techniques dans le texte (« known=false. ») : on les retire.
+    text = re.sub(r"\b(known|source_ids|suggest_save)\s*[=:]\s*\S+[.,;]?\s*", "", text, flags=re.I).strip()
     if not known and out.get("known"):
         text = ("Je n'ai pas d'information vérifiée pour répondre à ça, et je préfère ne pas inventer. "
                 "Tu peux garder cette question pour ton rendez-vous au Centre.")
