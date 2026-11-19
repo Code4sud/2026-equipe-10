@@ -3,7 +3,7 @@
 //  Rien d'autre à modifier : tout le front lit ces valeurs.
 // ─────────────────────────────────────────────────────────────
 export const theme = {
-  appName: 'EXPLORE',
+  appName: "TRAIT D'UNION",
   appTagline: 'tes possibles',
   personaNote: 'Démo · persona fictif',
 

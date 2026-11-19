@@ -1,7 +1,7 @@
 {
-  "nom": "Explore tes possibles",
-  "pitch": "Un assistant qui explique, avec ses sources, les métiers du Rapport des Possibles et donne envie de pousser la porte du Centre.",
-  "description": "Après le Centre des Possibles, un jeune repart avec une liste de métiers parfois inconnus. Le soir, seul, il se demande : c'est quoi concrètement, quel diplôme, est-ce possible sans le bac ? Personne n'est là pour répondre.\n\nExplore tes possibles lit le rapport directement sur le téléphone (rien n'est envoyé), relie chaque métier aux référentiels publics (ROME, ONISEP, Carif-Oref), montre tous les chemins pour y arriver près de Nice et répond aux questions en citant ses sources. Il dit « je ne sais pas » plutôt que d'inventer, ne donne jamais de note ni de classement, et prépare le rendez-vous avec le psychologue du Centre.",
+  "nom": "Trait d'union",
+  "pitch": "Trait d'union : un assistant qui explique, avec ses sources, les métiers du Rapport des Possibles et donne envie de pousser la porte du Centre.",
+  "description": "Après le Centre des Possibles, un jeune repart avec une liste de métiers parfois inconnus. Le soir, seul, il se demande : c'est quoi concrètement, quel diplôme, est-ce possible sans le bac ? Personne n'est là pour répondre.\n\nTrait d'union lit le rapport directement sur le téléphone (rien n'est envoyé), relie chaque métier aux référentiels publics (ROME, ONISEP, Carif-Oref), montre tous les chemins pour y arriver près de Nice et répond aux questions en citant ses sources. Il dit « je ne sais pas » plutôt que d'inventer, ne donne jamais de note ni de classement, et prépare le rendez-vous avec le psychologue du Centre.",
   "ecoles": [
     "Aivancity",
     "Centrale Méditerranée"

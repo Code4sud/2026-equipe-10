@@ -5,6 +5,11 @@ const API_URL = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\
 
 export const isDemoMode = API_URL === '';
 
+/** Réveille le backend gratuit (Render s'endort après 15 min d'inactivité ; le réveil prend jusqu'à ~50 s). */
+export function warmUp(): void {
+  if (!isDemoMode) fetch(`${API_URL}/api/health`).catch(() => {});
+}
+
 /**
  * Pose une question à l'assistant.
  * - Sans VITE_API_URL : mode démo, réponses construites localement.
@@ -16,6 +21,7 @@ export async function askAssistant(question: string, metier: Metier): Promise<As
   if (isDemoMode) return answerDemo(question, metier);
   try {
     const res = await fetch(`${API_URL}/api/chat`, {
+      signal: AbortSignal.timeout(70_000), // au-delà, on répond en mode démo
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ question, metier_id: metier.id, metier_nom: metier.nom, rome_code: metier.romeCode ?? null }),
