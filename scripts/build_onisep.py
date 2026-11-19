@@ -89,7 +89,8 @@ def main(xml_path: str) -> None:
             "romeV3": [r.text for r in m.findall("romesV3/romeV3") if r.text],
         }
         fiches[mid] = fiche
-        index.append({"id": mid, "nom": nom, "syn": syn, "niv": niv, "a": court(fiche["accroche"], 140)})
+        index.append({"id": mid, "nom": nom, "syn": syn, "niv": niv, "a": court(fiche["accroche"], 140),
+                      "ci": fiche["centresInteret"]})
 
     index.sort(key=lambda x: slug(x["nom"]))
     pub = ROOT / "public" / "data"

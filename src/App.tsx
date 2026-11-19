@@ -8,6 +8,7 @@ import { RapportTab } from './components/RapportTab';
 import { MetiersTab } from './components/MetiersTab';
 import { ChatTab } from './components/ChatTab';
 import { CentreTab } from './components/CentreTab';
+import { DecouvrirTab } from './components/DecouvrirTab';
 
 export default function App() {
   const [tab, setTab] = useState<TabId>('rapport');
@@ -52,6 +53,21 @@ export default function App() {
             onReset={() => { setSelection([]); setSourceLabel(''); setChats({}); setSelId(null); }}
             goMetiers={() => setTab('metiers')}
             goCentre={() => setTab('centre')}
+            goDecouvrir={() => setTab('decouvrir')}
+          />
+        )}
+        {tab === 'decouvrir' && (
+          <DecouvrirTab
+            onAddMetiers={(sel) => {
+              setSelection((cur) => [...cur, ...sel.filter((s) => !cur.some((c) => c.id === s.id))]);
+              if (!sourceLabel) setSourceLabel('Métiers choisis avec « Me découvrir »');
+              setSelId(null);
+              setTab('metiers');
+            }}
+            onSave={(q) => setSaved((s) => [...s, q])}
+            goCentre={() => setTab('centre')}
+            goRapport={() => setTab('rapport')}
+            rapport={selection.filter((s) => s.zone && s.id)}
           />
         )}
         {tab === 'metiers' && (

@@ -1,7 +1,7 @@
 // Contrats de données partagés entre le front, le backend et le pipeline de données.
 // Toute évolution se fait ici d'abord.
 
-export type TabId = 'rapport' | 'metiers' | 'chat' | 'centre';
+export type TabId = 'rapport' | 'metiers' | 'chat' | 'centre' | 'decouvrir';
 
 export interface Source {
   label: string; // ex. "ONISEP · fiche métier"
@@ -57,6 +57,7 @@ export interface IndexEntry {
   syn: string[];
   niv: string;
   a: string;
+  ci: string[]; // centres d'intérêt ONISEP (« j'aime le travail manuel »…)
 }
 
 export interface Zone {

@@ -13,9 +13,10 @@ interface Props {
   sourceLabel: string;
   goMetiers: () => void;
   goCentre: () => void;
+  goDecouvrir: () => void;
 }
 
-export function RapportTab({ count, onImport, onReset, sourceLabel, goMetiers, goCentre }: Props) {
+export function RapportTab({ count, onImport, onReset, sourceLabel, goMetiers, goCentre, goDecouvrir }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [index, setIndex] = useState<IndexEntry[]>([]);
   const [picking, setPicking] = useState(false);
@@ -103,9 +104,10 @@ export function RapportTab({ count, onImport, onReset, sourceLabel, goMetiers, g
           ) : (
             <Card>
               <div className="row"><Star size={18} /><strong className="title-sm">Pas encore passé·e au Centre ?</strong></div>
-              <p className="body">Tu as vu des métiers au lycée ou dans un salon ? Cherche-les dans la liste, puis viens faire le parcours complet au Centre des Possibles.</p>
+              <p className="body">Découvre ce qui t'attire en 5 minutes, ou cherche les métiers que tu as vus au lycée ou dans un salon. Puis viens faire le parcours complet au Centre des Possibles.</p>
+              <button type="button" className="btn" onClick={goDecouvrir}>Me découvrir · 5 minutes</button>
               <button type="button" className="btn btn-ghost" onClick={() => setPicking(true)}>Chercher des métiers</button>
-              <button type="button" className="btn" onClick={goCentre}>Découvrir le Centre</button>
+              <button type="button" className="link-btn" onClick={goCentre}>Découvrir le Centre</button>
             </Card>
           )}
         </div>
