@@ -1,0 +1,21 @@
+# Déploiement gratuit du backend sur Render (région Francfort, UE).
+# Render > New > Blueprint > choisir ce dépôt. Renseigner LLM_API_KEY dans le tableau de bord si besoin.
+services:
+  - type: web
+    name: explore-tes-possibles-api
+    runtime: python
+    region: frankfurt
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: LLM_BASE_URL
+        value: https://oai.endpoints.kepler.ai.cloud.ovh.net/v1
+      - key: LLM_MODEL
+        value: Meta-Llama-3_3-70B-Instruct
+      - key: LLM_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: http://localhost:5173,https://code4sud.github.io

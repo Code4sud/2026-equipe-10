@@ -6,10 +6,11 @@ import { CARIF, REGION_SUD } from '../data/demo';
 
 const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
-type Intent = 'verdict' | 'salaire' | 'hesite' | 'cout' | 'pres' | 'bac' | 'quoi';
+type Intent = 'salut' | 'verdict' | 'salaire' | 'hesite' | 'cout' | 'pres' | 'bac' | 'quoi';
 
 // L'ordre compte : on détecte d'abord les questions qui appellent une réponse prudente.
 const INTENTS: [Intent, RegExp][] = [
+  ['salut', /^(salut|bonjour|bonsoir|coucou|hello|hey|yo|merci|merci beaucoup|ok|d.?accord|cool|top)[\s!.?]*$/],
   ['verdict', /\b(nul|nulle|mort|pas capable|trop dur|j.?y arriverai|pas le niveau|bete|rate|echoue)\b/],
   ['salaire', /(salaire|gagn|paye combien|argent|€|euros)/],
   ['hesite', /(hesit|choisir|lequel|laquelle|le mieux|la mieux|departager|entre les deux)/],
@@ -25,9 +26,14 @@ export function detectIntent(question: string): Intent | null {
   return null;
 }
 
+export const GREETING =
+  "Salut ! Pose-moi une question sur ce métier : ce qu'on y fait, les études pour y arriver, les formations près de chez toi… Tu peux aussi cliquer sur une suggestion.";
+
 export function answerDemo(question: string, m: Metier): AssistantAnswer {
   const intent = detectIntent(question);
   switch (intent) {
+    case 'salut':
+      return { text: GREETING, sources: [], known: true, suggestSave: false };
     case 'quoi':
       return { text: m.pitch, sources: m.sources.slice(0, 2), known: true, suggestSave: false };
     case 'bac': {

@@ -26,7 +26,7 @@ export function ChatTab({ metiers, metierId, onMetierChange, messages, setMessag
   const endRef = useRef<HTMLDivElement>(null);
   const metier = metiers.find((m) => m.id === metierId) ?? metiers[0];
 
-   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }); }, [messages.length, busy]);
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }); }, [messages.length, busy]);
 
   if (!metier) {
     return (
@@ -74,7 +74,7 @@ export function ChatTab({ metiers, metierId, onMetierChange, messages, setMessag
 
         <div className="chat-box" aria-live="polite">
           <div className="bubble bot">
-            Salut ! Pose-moi tes questions sur ce métier. Je réponds avec les sources publiques, et je te dis quand je ne sais pas.
+            <span>Salut ! <strong>Je suis une intelligence artificielle</strong>, pas un·e conseiller·e. Pose-moi tes questions sur ce métier : je réponds avec les sources publiques (ROME, ONISEP, Carif-Oref) et je te dis quand je ne sais pas. Pour décider, c'est avec ton psychologue.</span>
           </div>
           {messages.map((m) =>
             m.role === 'user' ? (
@@ -94,7 +94,7 @@ export function ChatTab({ metiers, metierId, onMetierChange, messages, setMessag
               </div>
             ),
           )}
-          {busy && <div className="bubble bot typing" aria-label="L'assistant écrit">•••</div>}
+          {busy && <div className="bubble bot typing" role="status">L'IA cherche dans les fiches…</div>}
           <div ref={endRef} />
         </div>
 
@@ -111,7 +111,11 @@ export function ChatTab({ metiers, metierId, onMetierChange, messages, setMessag
             <button type="button" className="round-btn" aria-label="Parler au lieu d'écrire (bientôt)" title="Bientôt disponible"><IconMic /></button>
           )}
         </form>
-        {isDemoMode && <span className="muted tiny">Mode démo : réponses construites à partir des fiches, aucune donnée envoyée.</span>}
+        <span className="muted tiny">
+          {isDemoMode
+            ? 'Mode démo : réponses construites à partir des fiches, aucune donnée envoyée.'
+            : 'Réponses générées par une IA (modèle open weight hébergé en France) : vérifie les sources. Ton rapport n\u2019est jamais envoyé.'}
+        </span>
       </section>
 
       <aside className="chat-aside only-desktop">

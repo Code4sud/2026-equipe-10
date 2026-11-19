@@ -131,7 +131,7 @@ button, input, select { font: inherit; }
 .bubble { max-width: 88%; padding: 12px 14px; font-size: 14px; line-height: 1.55; display: flex; flex-direction: column; gap: 8px; }
 .bubble.user { align-self: flex-end; max-width: 80%; background: var(--c-primary); border-radius: 18px 18px 4px 18px; }
 .bubble.bot { align-self: flex-start; background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.18); border-radius: 18px 18px 18px 4px; }
-.bubble.typing { letter-spacing: .2em; }
+.bubble.typing { font-style: italic; color: var(--c-textSoft); }
 .warn { font-size: 12px; font-weight: 700; color: #FF9FD0; }
 .ok { font-size: 13px; font-weight: 700; color: #7BE3BF; }
 .save-btn { text-align: left; font-size: 13px; font-weight: 700; color: #fff; background: rgba(232,57,154,.3); border: 1px solid var(--c-accent); border-radius: 12px; padding: 10px 12px; min-height: 44px; cursor: pointer; }

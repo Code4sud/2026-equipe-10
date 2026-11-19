@@ -13,3 +13,5 @@ rapports*/
 *.pdf
 *.xlsx
 *.tsbuildinfo
+!.env.example
+.pytest_cache/
