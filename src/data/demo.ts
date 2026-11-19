@@ -23,3 +23,5 @@ export const ZONES: Zone[] = [
 
 export const REGION_SUD: Source = { label: 'orientation-regionsud.fr', url: 'https://www.orientation-regionsud.fr' };
 export const CARIF: Source = { label: 'Carif-Oref Sud · offre de formation' };
+export const ONISEP_AF: Source = { label: 'ONISEP · actions de formation (open data)', url: 'https://www.data.gouv.fr/datasets/ideo-actions-de-formation-initiale-univers-lycee' };
+export const LBA: Source = { label: 'La bonne alternance', url: 'https://labonnealternance.apprentissage.beta.gouv.fr' };

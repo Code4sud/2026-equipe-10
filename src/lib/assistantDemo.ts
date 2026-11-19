@@ -2,7 +2,7 @@
 // Les réponses sont construites à partir des fiches (données sourcées) et
 // respectent les 3 règles : pas de verdict, sources citées, « je ne sais pas ».
 import type { AssistantAnswer, Metier } from '../types';
-import { CARIF, REGION_SUD } from '../data/demo';
+import { LBA, ONISEP_AF, REGION_SUD } from '../data/demo';
 
 const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
@@ -41,11 +41,19 @@ export function answerDemo(question: string, m: Metier): AssistantAnswer {
       const niv = m.niveauMin ? `D'après l'ONISEP, le niveau minimal est : ${m.niveauMin}.` : '';
       return { text: `${niv} ${chemins || m.accesFrance}`.trim(), sources: m.sources, known: true, suggestSave: false };
     }
-    case 'pres':
+    case 'pres': {
+      const { liste, dep06, alternanceUrl } = m.proches;
+      if (!liste.length)
+        return {
+          text: "Je ne trouve pas de formation pour ce métier en région Sud dans les données de l'ONISEP. Ça ne ferme rien : regarde l'alternance, et parles-en avec ton psychologue, qui peut t'aider à chercher plus loin.",
+          sources: [{ ...LBA, url: alternanceUrl }, REGION_SUD], known: false, suggestSave: true,
+        };
+      const ex = liste.slice(0, 3).map((f) => `${f.intitule} (${f.etablissement}, ${f.ville}, ${f.distanceKm} km)`).join(' ; ');
       return {
-        text: "Les formations près de chez toi s'afficheront dans la fiche du métier, avec la distance depuis ta commune. Tu peux aussi les chercher sur orientation-regionsud.fr, la même base que sur la borne du Centre.",
-        sources: [CARIF, REGION_SUD], known: true, suggestSave: false,
+        text: `${dep06 ? `Il y a ${dep06} formation${dep06 > 1 ? 's' : ''} dans les Alpes-Maritimes.` : "Il n'y en a pas dans les Alpes-Maritimes, mais il y en a en région Sud."} Les plus proches de Nice : ${ex}. Toute la liste est dans la fiche du métier, et l'alternance est sur La bonne alternance.`,
+        sources: [ONISEP_AF, { ...LBA, url: alternanceUrl }], known: true, suggestSave: false,
       };
+    }
     case 'cout':
       return {
         text: "En apprentissage, la formation est gratuite et tu es payé·e. Au lycée public, l'enseignement est gratuit. Pour les écoles privées, les frais varient : vérifie sur la fiche de l'établissement.",

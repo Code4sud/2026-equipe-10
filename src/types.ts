@@ -13,13 +13,24 @@ export interface Chemin {
   detail: string;
 }
 
+/** Une formation réelle en région Sud (open data ONISEP), distance à vol d'oiseau depuis Nice. */
 export interface Formation {
   intitule: string;
+  niveau: string; // niveau de sortie
   etablissement: string;
   ville: string;
-  distanceKm?: number;
-  apprentissage: boolean;
-  source: Source;
+  distanceKm: number;
+  statut: string; // public, privé…
+  cout: string;
+  duree: string;
+  url: string; // fiche établissement ONISEP
+}
+
+export interface Proches {
+  dep06: number; // nombre de formations dans les Alpes-Maritimes
+  region: number; // nombre en région Sud
+  liste: Formation[];
+  alternanceUrl: string; // La bonne alternance, filtré sur le métier et autour de Nice
 }
 
 export interface Metier {
@@ -32,7 +43,7 @@ export interface Metier {
   plusAccessible: boolean; // true si l'accès réel en France est plus court que la zone
   chemins: Chemin[];
   sources: Source[];
-  formations: Formation[]; // vide en démo : affichage d'un emplacement
+  proches: Proches;
   romeCode?: string;
   onetCode?: string;
   niveauMin?: string; // niveau minimal d'accès selon l'ONISEP

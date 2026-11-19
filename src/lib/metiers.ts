@@ -16,7 +16,17 @@ interface OnisepFiche {
   accesIntro: string;
   chemins: { titre: string; items: string[] }[];
   salaireDebutant: string;
+  romeV3?: string[];
+  proches?: {
+    dep06: number; region: number;
+    liste: { f: string; n: string; e: string; v: string; s: string; c: string; duree: string; u: string; km: number }[];
+  } | null;
 }
+
+const NICE = { lat: 43.6969, lon: 7.2706 };
+/** Recherche La bonne alternance (service public) : offres et formations en apprentissage pour ces codes ROME, autour de Nice. */
+export const alternanceUrl = (romes: string[] = []) =>
+  `https://labonnealternance.apprentissage.beta.gouv.fr/recherche?romes=${encodeURIComponent(romes.join(','))}&lat=${NICE.lat}&lon=${NICE.lon}&radius=30&address=Nice`;
 
 export const normalize = (s: string) =>
   s
@@ -48,7 +58,7 @@ function sansFiche(sel: Selection, i: number): Metier {
   return {
     id: `rapport-${i}`, nom: sel.label ?? 'Métier', zoneRapport: sel.zone, sansFiche: true,
     pitch: "Ce métier de ton rapport n'a pas de fiche ONISEP correspondante. Ton psychologue pourra t'en parler au Centre.",
-    accesCourt: 'Pas de fiche ONISEP', accesFrance: '', plusAccessible: false, chemins: [], sources: [], formations: [],
+    accesCourt: 'Pas de fiche ONISEP', accesFrance: '', plusAccessible: false, chemins: [], sources: [], proches: { dep06: 0, region: 0, liste: [], alternanceUrl: alternanceUrl() },
   };
 }
 
@@ -67,7 +77,14 @@ function toMetier(f: OnisepFiche, sel: Selection): Metier {
     plusAccessible: !!zone && !!f.niveauRang && f.niveauRang < zone,
     chemins: f.chemins.map((c) => ({ titre: c.titre, detail: c.items.join(' · ') })),
     sources: [{ label: 'ONISEP · fiche métier', url: f.url }],
-    formations: [],
+    proches: {
+      dep06: f.proches?.dep06 ?? 0,
+      region: f.proches?.region ?? 0,
+      liste: (f.proches?.liste ?? []).map((x) => ({
+        intitule: x.f, niveau: x.n, etablissement: x.e, ville: x.v, distanceKm: x.km, statut: x.s, cout: x.c, duree: x.duree, url: x.u,
+      })),
+      alternanceUrl: alternanceUrl(f.romeV3),
+    },
     niveauMin: niv,
     salaire: f.salaireDebutant || undefined,
   };

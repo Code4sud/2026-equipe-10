@@ -1,4 +1,5 @@
-import { ZONES, CARIF, REGION_SUD } from '../data/demo';
+import { useState } from 'react';
+import { ZONES, LBA, ONISEP_AF, REGION_SUD } from '../data/demo';
 import type { Metier } from '../types';
 import { Card, Sources } from './Layout';
 import { IconBack, Star } from './Icons';
@@ -60,7 +61,7 @@ export function MetiersTab({ metiers, selId, onSelect, onAsk, goRapport }: Props
           <Card className="empty only-desktop">
             <Star size={36} />
             <strong className="disp title-lg">Choisis un métier</strong>
-            <p className="body">Sa fiche s'affiche ici : en 30 secondes, ce que dit ton rapport et la réalité en France, les chemins et les formations près de chez toi.</p>
+            <p className="body">Sa fiche s'affiche ici : en 30 secondes, ce que dit ton rapport et la réalité en France, les chemins et les vraies formations près de Nice.</p>
           </Card>
         )}
       </section>
@@ -122,23 +123,7 @@ function Fiche({ m, onBack, onAsk }: { m: Metier; onBack: () => void; onAsk: () 
         <Sources sources={m.sources} />
       </Card>}
 
-      <Card>
-        <div className="row between"><h2 className="h2">Près de chez toi</h2><span className="muted">depuis Nice · 30 km</span></div>
-        {m.formations.length ? (
-          m.formations.map((f) => (
-            <div key={f.intitule + f.etablissement} className="formation">
-              <strong>{f.intitule}</strong>
-              <span className="small">{f.etablissement} · {f.ville}{f.distanceKm != null ? ` · ${f.distanceKm} km` : ''}{f.apprentissage ? ' · apprentissage' : ''}</span>
-            </div>
-          ))
-        ) : (
-          <>
-            <div className="placeholder">[Formation · établissement · ville · km] données ONISEP / Carif-Oref</div>
-            <div className="placeholder">[Formation en apprentissage · CFA · ville · km]</div>
-          </>
-        )}
-        <Sources sources={[CARIF, REGION_SUD]} />
-      </Card>
+      <PresDeChezToi m={m} />
 
       <div className="grid-2 tight">
         <Card>
@@ -158,5 +143,43 @@ function Fiche({ m, onBack, onAsk }: { m: Metier; onBack: () => void; onAsk: () 
 
       <button type="button" className="btn" onClick={onAsk}>Poser une question sur ce métier</button>
     </article>
+  );
+}
+
+/** Vraies formations en région Sud (open data ONISEP), rangées par distance depuis Nice. Aucune n'est « conseillée ». */
+function PresDeChezToi({ m }: { m: Metier }) {
+  const [tout, setTout] = useState(false);
+  const { liste, dep06, region, alternanceUrl } = m.proches;
+  const vues = tout ? liste : liste.slice(0, 4);
+  return (
+    <Card>
+      <div className="row between"><h2 className="h2">Près de chez toi</h2><span className="muted">depuis Nice · à vol d'oiseau</span></div>
+      {liste.length ? (
+        <>
+          <p className="small">
+            {dep06 > 0 ? `${dep06} formation${dep06 > 1 ? 's' : ''} dans les Alpes-Maritimes` : 'Pas de formation dans les Alpes-Maritimes'}
+            {region > dep06 ? `, ${region} en région Sud` : ''}. Les plus proches :
+          </p>
+          {vues.map((f) => (
+            <a key={f.intitule + f.etablissement} className="formation" href={f.url} target="_blank" rel="noreferrer">
+              <span className="row between"><strong>{f.intitule}</strong><span className="km">{f.distanceKm} km</span></span>
+              <span className="small">{f.etablissement} · {f.ville}</span>
+              <span className="formation-tags">
+                {f.statut && <span className="tag">{f.statut}</span>}
+                {f.duree && <span className="tag">{f.duree}</span>}
+                {f.niveau && <span className="tag">sortie : {f.niveau}</span>}
+                {f.cout && <span className="tag tag-cout">{f.cout}</span>}
+              </span>
+            </a>
+          ))}
+          {liste.length > 4 && <button type="button" className="link-btn" onClick={() => setTout((t) => !t)}>{tout ? 'Voir moins' : `Voir les ${liste.length} plus proches`}</button>}
+        </>
+      ) : (
+        <p className="body">Pas de formation repérée en région Sud dans les données de l'ONISEP pour ce métier. Ça ne ferme rien : ton ou ta psychologue peut t'aider à chercher ailleurs, en alternance ou en formation continue.</p>
+      )}
+      <a className="btn btn-ghost" href={alternanceUrl} target="_blank" rel="noreferrer">Voir l'alternance autour de Nice ↗</a>
+      <span className="muted">En alternance, la formation est gratuite et tu es payé·e. Les offres et les CFA sont sur La bonne alternance, le service public de l'apprentissage.</span>
+      <Sources sources={[ONISEP_AF, LBA, REGION_SUD]} />
+    </Card>
   );
 }

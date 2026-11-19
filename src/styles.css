@@ -118,7 +118,13 @@ button, input, select { font: inherit; }
 .chemin { display: flex; gap: 10px; align-items: flex-start; }
 .chemin-num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 14px; background: var(--c-primary); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
 .placeholder { border: 1px dashed rgba(255,255,255,.35); border-radius: 10px; padding: 10px; font-size: 13px; color: #E0DDFF; }
-.formation { display: flex; flex-direction: column; gap: 2px; padding: 10px; border-radius: 10px; background: rgba(255,255,255,.05); }
+.formation { display: flex; flex-direction: column; gap: 4px; padding: 12px; border-radius: 10px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: #fff; text-decoration: none; }
+.formation:hover { border-color: var(--c-primarySoft); }
+.formation .row { align-items: flex-start; gap: 10px; }
+.formation strong::first-letter { text-transform: uppercase; }
+.km { flex-shrink: 0; font-family: var(--f-display); font-weight: 800; color: var(--c-accent); }
+.formation-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-cout { background: rgba(47,191,143,.3); }
 
 /* ---------- Assistant ---------- */
 .chat-layout { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; }
