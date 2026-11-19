@@ -24,7 +24,7 @@ export async function askAssistant(question: string, metier: Metier): Promise<As
       signal: AbortSignal.timeout(70_000), // au-delà, on répond en mode démo
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question, metier_id: metier.id, metier_nom: metier.nom, rome_code: metier.romeCode ?? null }),
+      body: JSON.stringify({ question, metier_id: metier.id, metier_nom: metier.nom, zone: metier.zoneRapport ?? null }),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();

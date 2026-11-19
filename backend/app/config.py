@@ -26,4 +26,4 @@ CORS_ORIGINS = [o.strip() for o in os.getenv(
     "CORS_ORIGINS", "http://localhost:5173,https://code4sud.github.io"
 ).split(",") if o.strip()]
 
-DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "metiers.json"
+DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "onisep.json"

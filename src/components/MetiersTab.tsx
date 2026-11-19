@@ -32,16 +32,17 @@ export function MetiersTab({ metiers, selId, onSelect, onAsk, goRapport }: Props
           <h1 className="disp h1">Tes métiers</h1>
           <p className="lead">Dans l'ordre de ton rapport, sans classement.</p>
         </header>
-        {ZONES.map((z) => {
-          const items = metiers.filter((m) => m.zoneRapport === z.numero);
-          if (!items.length) return null;
-          return (
-            <div key={z.numero} className="stack-sm">
-              <div className="zone-head"><span className="disp zone-label">Zone {z.numero}</span><span className="muted">{z.duree}</span></div>
-              {items.map((m) => (
+        {[...ZONES.map((z) => ({ key: `z${z.numero}`, label: `Zone ${z.numero}`, duree: z.duree, items: metiers.filter((m) => m.zoneRapport === z.numero) })),
+          { key: 'libre', label: 'Mes choix', duree: 'métiers choisis dans la liste', items: metiers.filter((m) => !m.zoneRapport) }]
+          .filter((g) => g.items.length)
+          .map((g) => (
+            <div key={g.key} className="stack-sm">
+              <div className="zone-head"><span className="disp zone-label">{g.label}</span><span className="muted">{g.duree}</span></div>
+              {g.items.map((m) => (
                 <button key={m.id} type="button" className={`metier-card${m.id === selId ? ' selected' : ''}`} onClick={() => onSelect(m.id)}>
-                  <span className="metier-nom">{m.nom}</span>
-                  <span className="metier-pitch">{m.pitch}</span>
+                  <span className="metier-nom">{m.libelleRapport ?? m.nom}</span>
+                  {m.libelleRapport && <span className="small">Fiche ONISEP : {m.nom}</span>}
+                  <span className="metier-pitch">{m.pitch.length > 170 ? `${m.pitch.slice(0, m.pitch.lastIndexOf(' ', 170))}…` : m.pitch}</span>
                   <span className="tags">
                     <span className="tag">{m.accesCourt}</span>
                     {m.plusAccessible && <span className="tag tag-accent">Plus accessible en France</span>}
@@ -49,8 +50,7 @@ export function MetiersTab({ metiers, selId, onSelect, onAsk, goRapport }: Props
                 </button>
               ))}
             </div>
-          );
-        })}
+          ))}
       </section>
 
       <section className="metiers-fiche">
@@ -69,21 +69,37 @@ export function MetiersTab({ metiers, selId, onSelect, onAsk, goRapport }: Props
 }
 
 function Fiche({ m, onBack, onAsk }: { m: Metier; onBack: () => void; onAsk: () => void }) {
-  const zone = ZONES[m.zoneRapport - 1];
+  const zone = m.zoneRapport ? ZONES[m.zoneRapport - 1] : null;
+  if (m.sansFiche) {
+    return (
+      <article className="stack">
+        <button type="button" className="link-btn back only-mobile" onClick={onBack}><IconBack /> Tes métiers</button>
+        <h1 className="disp h1">{m.nom}</h1>
+        <Card>
+          <h2 className="h2">Pas encore de fiche</h2>
+          <p className="body">{m.pitch}</p>
+          {zone && <span className="muted">Ton rapport : zone {zone.numero} ({zone.duree})</span>}
+          <a href={REGION_SUD.url} target="_blank" rel="noreferrer" className="small strong">Chercher ce métier sur orientation-regionsud.fr ↗</a>
+        </Card>
+        <button type="button" className="btn" onClick={onAsk}>Poser une question sur ce métier</button>
+      </article>
+    );
+  }
   return (
     <article className="stack">
       <button type="button" className="link-btn back only-mobile" onClick={onBack}><IconBack /> Tes métiers</button>
-      <h1 className="disp h1">{m.nom}</h1>
+      <h1 className="disp h1">{m.libelleRapport ?? m.nom}</h1>
+      {m.libelleRapport && <span className="muted">Fiche ONISEP la plus proche : {m.nom}. Vérifie avec ton psychologue que c'est bien le même métier.</span>}
 
       <Card>
         <h2 className="h2">En 30 secondes</h2>
         <p className="body">{m.pitch}</p>
-        <Sources sources={m.sources.slice(0, 1)} />
+        <Sources sources={m.sources} />
       </Card>
 
       <Card>
-        <h2 className="h2">Ton rapport et la réalité en France</h2>
-        <span className="muted">Ton rapport : zone {zone.numero} ({zone.duree})</span>
+        <h2 className="h2">{zone ? 'Ton rapport et la réalité en France' : "Comment on y accède en France"}</h2>
+        {zone && <span className="muted">Ton rapport : zone {zone.numero} ({zone.duree}){m.niveauMin ? ` · ONISEP : niveau minimal ${m.niveauMin}` : ''}</span>}
         {m.plusAccessible ? (
           <div className="good-news">
             <span className="row"><Star /> <strong>Bonne nouvelle</strong></span>
@@ -92,10 +108,10 @@ function Fiche({ m, onBack, onAsk }: { m: Metier; onBack: () => void; onAsk: () 
         ) : (
           <p className="body">{m.accesFrance}</p>
         )}
-        <Sources sources={m.sources.filter((s) => s.label.startsWith('ONISEP'))} />
+        <Sources sources={m.sources} />
       </Card>
 
-      <Card>
+      {m.chemins.length > 0 && <Card>
         <h2 className="h2">Les chemins pour y arriver</h2>
         {m.chemins.map((c, i) => (
           <div key={c.titre} className="chemin">
@@ -103,7 +119,8 @@ function Fiche({ m, onBack, onAsk }: { m: Metier; onBack: () => void; onAsk: () 
             <span className="stack-xs"><strong>{c.titre}</strong><span className="small">{c.detail}</span></span>
           </div>
         ))}
-      </Card>
+        <Sources sources={m.sources} />
+      </Card>}
 
       <Card>
         <div className="row between"><h2 className="h2">Près de chez toi</h2><span className="muted">depuis Nice · 30 km</span></div>
@@ -130,8 +147,12 @@ function Fiche({ m, onBack, onAsk }: { m: Metier; onBack: () => void; onAsk: () 
         </Card>
         <Card>
           <strong>Et le salaire ?</strong>
-          <span className="small">Pas de chiffre inventé : regarde la fiche régionale.</span>
-          <a href={REGION_SUD.url} target="_blank" rel="noreferrer" className="small strong">orientation-regionsud.fr ↗</a>
+          {m.salaire ? (
+            <span className="small">Pour un·e débutant·e, d'après l'ONISEP : {m.salaire.charAt(0).toLowerCase() + m.salaire.slice(1)}. Ça varie selon la région et l'employeur.</span>
+          ) : (
+            <span className="small">Pas de chiffre vérifié : regarde la fiche régionale.</span>
+          )}
+          <a href={REGION_SUD.url} target="_blank" rel="noreferrer" className="small strong">Salaires en Région Sud ↗</a>
         </Card>
       </div>
 

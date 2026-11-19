@@ -25,7 +25,7 @@ export interface Formation {
 export interface Metier {
   id: string;
   nom: string;
-  zoneRapport: 1 | 2 | 3 | 4 | 5; // zone indiquée par le Rapport des Possibles (O*NET)
+  zoneRapport?: ZoneNum; // zone indiquée par le Rapport des Possibles (absente si choisi dans la liste)
   pitch: string; // "En 30 secondes"
   accesCourt: string; // étiquette sur la carte
   accesFrance: string; // réalité de l'accès en France (ONISEP)
@@ -35,10 +35,32 @@ export interface Metier {
   formations: Formation[]; // vide en démo : affichage d'un emplacement
   romeCode?: string;
   onetCode?: string;
+  niveauMin?: string; // niveau minimal d'accès selon l'ONISEP
+  salaire?: string; // « salaire du débutant » selon l'ONISEP
+  libelleRapport?: string; // intitulé du rapport, s'il diffère du nom ONISEP
+  sansFiche?: boolean; // intitulé du rapport sans fiche ONISEP correspondante
+}
+
+export type ZoneNum = 1 | 2 | 3 | 4 | 5;
+
+/** Un métier retenu : son identifiant ONISEP et, s'il vient du rapport, sa zone. */
+export interface Selection {
+  id?: string; // fiche ONISEP ; absente si l'intitulé du rapport n'a pas de fiche correspondante
+  zone?: ZoneNum;
+  label?: string; // intitulé tel qu'écrit dans le rapport
+}
+
+/** Entrée de l'index de recherche (public/data/metiers-index.json). */
+export interface IndexEntry {
+  id: string;
+  nom: string;
+  syn: string[];
+  niv: string;
+  a: string;
 }
 
 export interface Zone {
-  numero: 1 | 2 | 3 | 4 | 5;
+  numero: ZoneNum;
   duree: string;
 }
 

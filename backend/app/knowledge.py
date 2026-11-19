@@ -1,7 +1,8 @@
-"""Base de connaissances : les faits sourcés sur chaque métier.
+"""Base de connaissances : les faits sourcés sur chaque métier, tirés de l'open data ONISEP.
 
 L'IA n'a le droit de répondre QU'À PARTIR de ces faits. Chaque fait a un identifiant (F1, F2…)
 que l'IA doit citer ; le backend vérifie ensuite que les identifiants cités existent vraiment.
+Données : backend/data/onisep.json, généré par scripts/build_onisep.py (1 138 fiches métiers).
 """
 import json
 from dataclasses import dataclass
@@ -11,6 +12,7 @@ from .config import DATA_FILE
 
 REGION_SUD = {"label": "orientation-regionsud.fr", "url": "https://www.orientation-regionsud.fr"}
 APPRENTISSAGE = {"label": "ONISEP · apprentissage", "url": "https://www.onisep.fr"}
+ZONES = {1: "0 à 6 mois de préparation", 2: "3 mois à 2 ans", 3: "1 à 4 ans", 4: "2 à 6 ans", 5: "4 à 10 ans"}
 
 
 @dataclass
@@ -21,41 +23,48 @@ class Fact:
 
 
 @lru_cache
-def _data() -> dict:
+def _fiches() -> dict:
     return json.loads(DATA_FILE.read_text(encoding="utf-8"))
 
 
 def get_metier(metier_id: str) -> dict | None:
-    return next((m for m in _data()["metiers"] if m["id"] == metier_id), None)
+    return _fiches().get(metier_id)
 
 
-def facts_for(metier: dict) -> list[Fact]:
-    """Transforme la fiche d'un métier en faits numérotés et sourcés."""
-    src = {s["label"]: s for s in metier.get("sources", [])}
-    onisep_metier = next((s for k, s in src.items() if "fiche métier" in k), {"label": "ONISEP"})
-    onisep_form = next((s for k, s in src.items() if "formations" in k), onisep_metier)
-    rome = next((s for k, s in src.items() if k.startswith("ROME")), onisep_metier)
-    zone = next(z for z in _data()["zones"] if z["numero"] == metier["zoneRapport"])
+def nom(fiche: dict) -> str:
+    return fiche["nom"].replace("/", "·")
 
-    facts = [
-        Fact("F1", f"Description du métier {metier['nom']} : {metier['pitch']}", onisep_metier),
-        Fact("F2", f"Accès au métier en France : {metier['accesFrance']}", onisep_form),
-        Fact("F3", f"Dans le Rapport des Possibles, ce métier est en zone {zone['numero']} ({zone['duree']}). "
-                   + ("En France, l'accès réel est plus court que ce que la zone laisse penser."
-                      if metier.get("plusAccessible") else ""), onisep_form),
+
+def onisep(fiche: dict) -> dict:
+    return {"label": "ONISEP · fiche métier", "url": fiche["url"]}
+
+
+def facts_for(fiche: dict, zone: int | None = None) -> list[Fact]:
+    """Transforme une fiche ONISEP en faits numérotés et sourcés."""
+    src = onisep(fiche)
+    textes = [
+        f"Ce que fait un·e {nom(fiche)} : {fiche['accroche'] or fiche['description']}",
+        f"Niveau d'accès minimal selon l'ONISEP : {fiche['niveauMin']}." if fiche.get("niveauMin") else "",
+        f"Accès au métier : {fiche['accesIntro']}" if fiche.get("accesIntro") else "",
     ]
-    for i, c in enumerate(metier.get("chemins", []), start=len(facts) + 1):
-        facts.append(Fact(f"F{i}", f"Chemin possible « {c['titre']} » : {c['detail']}", onisep_form))
+    textes += [f"Chemin « {c['titre']} » : {' ; '.join(c['items'])}." for c in fiche.get("chemins", [])]
+    if fiche.get("formationsMin"):
+        textes.append("Exemples de formations minimales requises : " + " ; ".join(fiche["formationsMin"][:4]) + ".")
+    if fiche.get("conditions"):
+        textes.append(f"Conditions de travail : {fiche['conditions']}")
+    if fiche.get("competences"):
+        textes.append(f"Qualités et compétences utiles : {fiche['competences']}")
+    if zone in ZONES:
+        rang = fiche.get("niveauRang")
+        plus_court = bool(rang) and rang < zone
+        textes.append(f"Dans le Rapport des Possibles, ce métier est en zone {zone} ({ZONES[zone]}). "
+                      + ("D'après l'ONISEP, l'accès réel en France est plus court que ce que la zone laisse penser." if plus_court else ""))
+
+    facts = [Fact(f"F{i}", t, src) for i, t in enumerate([t for t in textes if t], start=1)]
     n = len(facts)
     facts += [
         Fact(f"F{n+1}", "En apprentissage, la formation est gratuite pour l'apprenti et il est rémunéré.", APPRENTISSAGE),
         Fact(f"F{n+2}", "Les formations proches de chez soi et les salaires régionaux se consultent sur "
                         "orientation-regionsud.fr, la base utilisée sur la borne du Centre des Possibles.", REGION_SUD),
-        Fact(f"F{n+3}", f"Les compétences et conditions de travail du métier {metier['nom']} sont décrites "
-                        "dans la fiche ROME correspondante.", rome),
     ]
-    for f in metier.get("formations", []):
-        n = len(facts)
-        facts.append(Fact(f"F{n+1}", f"Formation {f['intitule']} à {f['etablissement']}, {f['ville']}"
-                                     + (" (en apprentissage)" if f.get("apprentissage") else ""), f["source"]))
     return facts

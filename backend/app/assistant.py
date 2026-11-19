@@ -7,7 +7,7 @@ from openai import OpenAI
 
 from . import config
 from .guardrails import SAFE_FALLBACK, find_verdict, has_salary_figure
-from .knowledge import REGION_SUD, Fact, facts_for
+from .knowledge import REGION_SUD, Fact, facts_for, nom, onisep
 
 def _sans_cle(request: httpx.Request) -> None:
     # OVH AI Endpoints s'utilise gratuitement SANS clé : on retire alors l'en-tête d'authentification,
@@ -22,7 +22,7 @@ client = OpenAI(
     http_client=None if config.HAS_KEY else httpx.Client(event_hooks={"request": [_sans_cle]}),
 )
 
-SYSTEM = """Tu es l'assistant d'orientation «  Trait d'union  » pour des jeunes de 16 à 25 ans à Nice.
+SYSTEM = """Tu es l'assistant d'orientation « Trait d'union » pour des jeunes de 16 à 25 ans à Nice.
 Tu réponds en français, en tutoyant, avec des phrases courtes et simples (3 à 5 phrases maximum).
 
 RÈGLES ABSOLUES :
@@ -65,28 +65,35 @@ def _call_llm(question: str, metier_nom: str, facts: list[Fact], extra: str = ""
     return json.loads(match.group(0))
 
 
-def answer(question: str, metier: dict) -> dict:
-    facts = facts_for(metier)
+def answer(question: str, metier: dict, zone: int | None = None) -> dict:
+    facts = facts_for(metier, zone)
     by_id = {f.id: f for f in facts}
 
     # Salutations et remerciements : réponse immédiate, sans IA.
     if GREETING_Q.match(question.strip()):
         return {"text": GREETING, "sources": [], "known": True, "suggest_save": False}
 
-    # Les salaires ne passent pas par l'IA : aucune source chiffrée vérifiée dans nos données.
+    # Les salaires ne passent jamais par l'IA : chiffre ONISEP tel quel (sourcé), sinon renvoi vers la base régionale.
     if SALARY_Q.search(question):
+        if metier.get("salaireDebutant"):
+            s = metier["salaireDebutant"]
+            return {
+                "text": f"D'après l'ONISEP, pour un·e débutant·e : {s[0].lower() + s[1:]}. Ça varie selon la région, "
+                        "l'employeur et ton parcours : la fiche sur orientation-regionsud.fr donne les salaires dans la région.",
+                "sources": [onisep(metier), REGION_SUD], "known": True, "suggest_save": False,
+            }
         return {
             "text": "Je n'ai pas de chiffre vérifié et je ne veux pas t'en inventer un. La fiche du métier sur "
                     "orientation-regionsud.fr donne les salaires dans la région : c'est la même base que sur la borne du Centre.",
             "sources": [REGION_SUD], "known": False, "suggest_save": True,
         }
 
-    out = _call_llm(question, metier["nom"], facts)
+    out = _call_llm(question, nom(metier), facts)
 
     # Garde-fou 1 : verdict ou chiffre de salaire -> on redemande une fois, plus strictement.
     problem = find_verdict(out.get("answer", "")) or ("salaire chiffré" if has_salary_figure(out.get("answer", "")) else None)
     if problem:
-        out = _call_llm(question, metier["nom"], facts,
+        out = _call_llm(question, nom(metier), facts,
                         extra=f"\n\nATTENTION : ta réponse précédente contenait « {problem} », ce qui est interdit. Reformule sans juger et sans chiffre.")
         if find_verdict(out.get("answer", "")) or has_salary_figure(out.get("answer", "")):
             return {"text": SAFE_FALLBACK, "sources": [], "known": False, "suggest_save": True}
@@ -95,7 +102,7 @@ def answer(question: str, metier: dict) -> dict:
     cited = [by_id[i] for i in out.get("source_ids", []) if i in by_id]
     known = bool(out.get("known")) and bool(cited)
     text = str(out.get("answer", "")).strip()
-        # Certains modèles recopient des champs techniques dans le texte (« known=false. ») : on les retire.
+    # Certains modèles recopient des champs techniques dans le texte (« known=false. ») : on les retire.
     text = re.sub(r"\b(known|source_ids|suggest_save)\s*[=:]\s*\S+[.,;]?\s*", "", text, flags=re.I).strip()
     if not known and out.get("known"):
         text = ("Je n'ai pas d'information vérifiée pour répondre à ça, et je préfère ne pas inventer. "

@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
-import { METIERS } from './data/demo';
+import { useEffect, useState } from 'react';
+import { loadMetiers } from './lib/metiers';
 import { load, save } from './lib/storage';
 import { theme } from './theme';
-import type { ChatMessage, SavedQuestion, TabId } from './types';
+import type { ChatMessage, Metier, SavedQuestion, Selection, TabId } from './types';
 import { NavTabs, Wordmark } from './components/Layout';
 import { RapportTab } from './components/RapportTab';
 import { MetiersTab } from './components/MetiersTab';
@@ -11,21 +11,26 @@ import { CentreTab } from './components/CentreTab';
 
 export default function App() {
   const [tab, setTab] = useState<TabId>('rapport');
-  const [metierIds, setMetierIds] = useState<string[]>(() => load('metiers', []));
+  const [selection, setSelection] = useState<Selection[]>(() => load('selection', []));
+  const [metiers, setMetiers] = useState<Metier[]>([]);
   const [sourceLabel, setSourceLabel] = useState<string>(() => load('sourceLabel', ''));
   const [selId, setSelId] = useState<string | null>(null);
   const [chatMetierId, setChatMetierId] = useState<string>('');
   const [chats, setChats] = useState<Record<string, ChatMessage[]>>({});
   const [saved, setSaved] = useState<SavedQuestion[]>(() => load('saved', []));
 
-   useEffect(() => { save('metiers', metierIds); }, [metierIds]);
+  useEffect(() => {
+    save('selection', selection);
+    let alive = true;
+    loadMetiers(selection).then((m) => { if (alive) setMetiers(m); });
+    return () => { alive = false; };
+  }, [selection]);
   useEffect(() => { save('sourceLabel', sourceLabel); }, [sourceLabel]);
   useEffect(() => { save('saved', saved); }, [saved]);
   useEffect(() => { window.scrollTo({ top: 0 }); }, [tab, selId]);
 
   // On garde l'ordre du rapport (jamais de tri par « pertinence »).
-  const metiers = useMemo(() => METIERS.filter((m) => metierIds.includes(m.id)), [metierIds]);
-  const activeChatId = chatMetierId && metierIds.includes(chatMetierId) ? chatMetierId : metiers[0]?.id ?? '';
+  const activeChatId = chatMetierId && metiers.some((m) => m.id === chatMetierId) ? chatMetierId : metiers[0]?.id ?? '';
 
   return (
     <div className="app">
@@ -41,10 +46,10 @@ export default function App() {
       <main className="container main">
         {tab === 'rapport' && (
           <RapportTab
-            metierIds={metierIds}
+            count={selection.length}
             sourceLabel={sourceLabel}
-            onImport={(ids, label) => { setMetierIds(ids); setSourceLabel(label); setSelId(null); setTab('metiers'); }}
-            onReset={() => { setMetierIds([]); setSourceLabel(''); setChats({}); setSelId(null); }}
+            onImport={(sel, label) => { setSelection(sel); setSourceLabel(label); setSelId(null); setTab('metiers'); }}
+            onReset={() => { setSelection([]); setSourceLabel(''); setChats({}); setSelId(null); }}
             goMetiers={() => setTab('metiers')}
             goCentre={() => setTab('centre')}
           />

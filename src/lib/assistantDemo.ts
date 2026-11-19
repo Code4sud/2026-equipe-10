@@ -35,10 +35,11 @@ export function answerDemo(question: string, m: Metier): AssistantAnswer {
     case 'salut':
       return { text: GREETING, sources: [], known: true, suggestSave: false };
     case 'quoi':
-      return { text: m.pitch, sources: m.sources.slice(0, 2), known: true, suggestSave: false };
+      return { text: m.pitch, sources: m.sources, known: true, suggestSave: false };
     case 'bac': {
-      const chemins = m.chemins.map((c) => `${c.titre} : ${c.detail.charAt(0).toLowerCase()}${c.detail.slice(1)}`).join(' ');
-      return { text: `${m.accesFrance} ${chemins}`, sources: m.sources.filter((s) => s.label.startsWith('ONISEP')), known: true, suggestSave: false };
+      const chemins = m.chemins.slice(0, 3).map((c) => `${c.titre} : ${c.detail}.`).join(' ');
+      const niv = m.niveauMin ? `D'après l'ONISEP, le niveau minimal est : ${m.niveauMin}.` : '';
+      return { text: `${niv} ${chemins || m.accesFrance}`.trim(), sources: m.sources, known: true, suggestSave: false };
     }
     case 'pres':
       return {
@@ -51,6 +52,11 @@ export function answerDemo(question: string, m: Metier): AssistantAnswer {
         sources: [{ label: 'ONISEP · apprentissage', url: 'https://www.onisep.fr' }], known: true, suggestSave: false,
       };
     case 'salaire':
+      if (m.salaire)
+        return {
+          text: `D'après l'ONISEP, pour un·e débutant·e : ${m.salaire.charAt(0).toLowerCase() + m.salaire.slice(1)}. Ça varie selon la région, l'employeur et ton parcours : la fiche sur orientation-regionsud.fr donne les salaires dans la région.`,
+          sources: [...m.sources, REGION_SUD], known: true, suggestSave: false,
+        };
       return {
         text: "Je n'ai pas de chiffre vérifié et je ne veux pas t'en inventer un. La fiche du métier sur orientation-regionsud.fr donne les salaires dans la région : c'est la même base que sur la borne du Centre.",
         sources: [REGION_SUD], known: false, suggestSave: true,
@@ -63,7 +69,7 @@ export function answerDemo(question: string, m: Metier): AssistantAnswer {
     case 'verdict':
       return {
         text: `Aucune note ni aucun résultat ne ferme la porte de ce métier. ${m.chemins.length > 1 ? `Il y a plusieurs chemins pour y arriver : « ${m.chemins[0].titre} » ou « ${m.chemins[1].titre} », par exemple.` : ''} Si ça t'inquiète, parles-en avec ton psychologue : il connaît ton parcours et peut t'aider à voir les étapes.`,
-        sources: m.sources.filter((s) => s.label.startsWith('ONISEP')), known: true, suggestSave: true,
+        sources: m.sources, known: true, suggestSave: true,
       };
     default:
       return {

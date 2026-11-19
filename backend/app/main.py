@@ -19,7 +19,7 @@ class ChatIn(BaseModel):
     question: str = Field(min_length=1, max_length=500)
     metier_id: str = Field(min_length=1, max_length=80)
     metier_nom: str | None = None
-    rome_code: str | None = None
+    zone: int | None = Field(default=None, ge=1, le=5)
 
 
 class ChatOut(BaseModel):
@@ -40,6 +40,6 @@ def chat(body: ChatIn) -> ChatOut:
     if metier is None:
         raise HTTPException(404, "Métier inconnu")
     try:
-        return ChatOut(**answer(body.question, metier))
+        return ChatOut(**answer(body.question, metier, body.zone))
     except Exception as exc:  # IA indisponible : le front bascule tout seul en mode démo
         raise HTTPException(503, f"Assistant indisponible : {type(exc).__name__}") from exc
